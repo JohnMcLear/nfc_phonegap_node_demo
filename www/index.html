@@ -1,0 +1,22 @@
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript">
+var app = {
+  initialize: function () { this.bind(); },
+  bind: function () { document.addEventListener('deviceready', this.deviceready, false); },
+  deviceready: function () {
+    nfc.addNdefListener(function (nfcEvent) {
+      var payload = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].payload); // get the ndef record from the nfc tag
+      var url = "http://127.0.0.1:3000/access"; // where we are posting the ndef record
+      $.get({url: url, data: payload}); // get payload from server, prolly should use post but when your right you're right
+      console.log("Attempting to bind to NFC", payload);
+    }, function () {
+      console.log("Success.  Listening for NFC..");
+    }, function () {
+      alert("NFC Functionality is not working, is NFC enabled on your device?");
+    });
+  }
+}
+app.initialize();
+</script>
+
