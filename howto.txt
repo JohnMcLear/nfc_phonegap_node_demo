@@ -1,0 +1,66 @@
+npm install express ejs
+npm install -g phonegap weinre
+
+// create phonegap files
+1. mkdir www
+2. create a config.xml from a boiler plate and copy jq
+cp /home/jose/config.xml ./www
+cp /home/jose/jquery.min.js ./www
+3. Edit the xml file changing the values
+4. Create an www/index.html
+Add js to initialize the app
+<script type="text/javascript" src="cordova.js"></script>
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript">
+var app = {
+  initialize: function () { this.bind(); },
+  bind: function () { document.addEventListener('deviceready', this.deviceready, false); },
+  deviceready: function () {
+    nfc.addNdefListener(function (nfcEvent) {
+      var payload = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].payload); // get the ndef record from the nfc tag
+      var url = "http://127.0.0.1:3000/access"; // where we are posting the ndef record
+      $.get({url: url, data: {"payload":payload}}); // get payload from server, prolly should use post but when your right you're right
+      console.log("Attempting to bind to NFC", payload);
+    }, function () {
+      console.log("Success.  Listening for NFC..");
+    }, function () {
+      alert("NFC Functionality is not working, is NFC enabled on your device?");
+    });
+  }
+}
+app.initialize();
+</script>
+
+// create server files
+5. back in ./ nano app.js
+
+// you will have seen this a million times before.
+var express = require('express'),
+ejs = require('ejs');
+
+var app = express();
+
+app.set('views', __dirname + '/');
+app.engine('html', require('ejs').renderFile);
+
+app.get('/', function(req, res) { // use ejs to render
+  res.render("index.html");
+});
+
+
+app.get('/access', function(req, res){
+  console.log("NFC ndef trying to get down into funky town", req.query.payload);
+  // just to show for now..
+  if(req.query.payload == "http://twitter.com/johnmclear"){
+    res.send("<script>alert('you win');</script>"); // obviously you would NEVER do this..
+  }
+});
+
+app.listen(3000);
+
+6. node app.js
+
+7. init repo folder before www
+8. push repo up to public github account
+9. visit http://build.phonegap.com
+10. Add the app, build, grab and test
