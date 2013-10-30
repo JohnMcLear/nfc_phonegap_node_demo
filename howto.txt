@@ -18,7 +18,7 @@ var app = {
   deviceready: function () {
     nfc.addNdefListener(function (nfcEvent) {
       var payload = nfc.bytesToString(nfcEvent.tag.ndefMessage[0].payload); // get the ndef record from the nfc tag
-      var url = "http://127.0.0.1:3000/access"; // where we are posting the ndef record
+      var url = "http://127.0.0.1:3000/access"; // where we are posting the ndef record - REMEMBER TO CHANGE THE IP
       $.get({url: url, data: {"payload":payload}}); // get payload from server, prolly should use post but when your right you're right
       console.log("Attempting to bind to NFC", payload);
     }, function () {
